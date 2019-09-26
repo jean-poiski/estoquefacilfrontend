@@ -1,1 +1,0 @@
-# EstoqueFacil shared/app
