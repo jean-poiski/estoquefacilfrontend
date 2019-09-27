@@ -1,5 +1,11 @@
 <?php
-//require_once "controller/utils.php";
+    session_start();
+
+    if(!isset($_SESSION["usuariologado"])) {
+        header("Location: login.php");
+        die();
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -11,22 +17,22 @@
   <title>Estoque Fácil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" media="screen" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="css/jquery.loading.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="css/font-awesome-animation.min.css" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
   <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
   <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
   
   <!-- Scripts --> 
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.js"></script>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
 
@@ -40,86 +46,101 @@
   <script type="text/javascript">
     $(document).ready(function(){
       
-      $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-      });
     });
   </script>
 
 </head>
 
 <body>
+    <div class="jumbotron">
 
-<div class="wrapper">
-       <!-- Sidebar  -->
-       <nav id="sidebar">
-            <div class="sidebar-header">
-                <h2>Estoque Fácil</h2>
-                <strong>EF</strong>
-            </div>
-
-            <ul class="list-unstyled components">
-                <li class="active">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                      <i class="fas fa-handshake"></i>
-                        Fornecedores
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                      <i class="fas fa-egg"></i>
-                        Produtos
-                    </a>
-                    <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                        <i class="fas fa-copy"></i>
-                        Pages
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-image"></i>
-                        Portfolio
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-question"></i>
-                        FAQ
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-paper-plane"></i>
-                        Contact
-                    </a>
-                </li>
-            </ul>
-
-            <ul class="list-unstyled CTAs">
-                <li>
-                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Download source</a>
-                </li>
-                <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Back to article</a>
-                </li>
-            </ul>
-        </nav>
-
-    <!-- Page Content  -->
-    <div id="content">
-
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-
-                <button type="button" id="sidebarCollapse" class="btn btn-info">
-                    <i class="fas fa-align-left"></i>
-                    <span>Toggle Sidebar</span>
-                </button>
-            </div>
-        </nav>
     </div>
-</div>
 
+    <!--TELA PRINCIPAL -->
+    <div class="container">
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item">
+            <a class="nav-link active" id="pills-produto-tab" data-toggle="pill" href="#pills-produto" role="tab" aria-controls="pills-produto" aria-selected="true">Produtos</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="pills-estoque-tab" data-toggle="pill" href="#pills-estoque" role="tab" aria-controls="pills-estoque" aria-selected="false">Controle do Estoque</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="pills-vendas-tab" data-toggle="pill" href="#pills-vendas" role="tab" aria-controls="pills-vendas" aria-selected="false">Vendas</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="pills-despesas-tab" data-toggle="pill" href="#pills-despesas" role="tab" aria-controls="pills-despesas" aria-selected="false">Despesas</a>
+            </li>
+        </ul>
+        <!--
+            
+        <div class="col-md-12 col-sm-6">
+          <div class="alert alert-danger fade show" role="alert">
+            Campos marcados com <span class="required"></span> são obrigatórios <i class="far fa-smile-wink"></i>
+          </div>
+        </div>
+        -->
+      
+
+        <div class="col-md-12 col-sm-6">
+
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-produto" role="tabpanel" aria-labelledby="pills-produto-tab">
+            </div>
+
+            <div class="tab-pane fade" id="pills-estoque" role="tabpanel" aria-labelledby="pills-despesas-tab">
+
+              <div class="row">
+                <div class="col-md-12 col-sm-6">
+                
+                </div>              
+              </div>
+
+              <div class="row">
+                <div class="col-md-12 col-sm-6">
+                  <button type="button" class="btn btn-secondary" onclick="trocarGuias('pills-produto-tab')"> <i class="fas fa-angle-left"></i> Voltar </button>
+                  <button type="button" class="btn btn-secondary float-right" onclick="trocarGuias('pills-vendas-tab')"> Próximo <i class="fas fa-angle-right"></i> </button>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="pills-vendas" role="tabpanel" aria-labelledby="pills-vendas-tab">
+
+            </div>
+            <div class="tab-pane fade" id="pills-despesas" role="tabpanel" aria-labelledby="pills-despesas-tab">
+              
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <!--FIM TELA PRINCIPAL -->
+
+
+
+<!-- MODAL DE LOGIN -->
+<div class="modal fade" id="modalHistoricos" tabindex="-1" role="dialog" aria-labelledby="modalHistoricosTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalHistoricosTitle">Histórico do Pedido</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body container-fluid" style="max-width: 100%; overflow-x: auto;">
+
+        <div id="gridHistoricos"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>    
 
 </body>
 

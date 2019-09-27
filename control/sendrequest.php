@@ -11,8 +11,6 @@ function getDataRequest() {
 
     $obj = getParams();
 
-    $obj["token"] = "a52ca3bb56742af0d66377d47a24a456";
-
     return http_build_query($obj);
 }
 

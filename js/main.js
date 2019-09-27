@@ -23,6 +23,75 @@ function mostraToast(mensagem, tipo="success") {
 }
 
 
+function validarCamposLogin(){
+    var formValido = true;
+
+    formValido = document.forms["formlogin"].checkValidity();
+
+    if(formValido)
+        efetuarLogin();
+    else
+        mostraToastAviso("Você preencheu seu usuário e sua senha?");
+
+    return formValido;
+}
+
+function mostraLoading(painel, mensagem) {
+    $(`#${painel}`).loading({
+        message: `<i class="fa fa-dolly faa-passing animated"></i> ${mensagem}`
+    });
+}
+
+function fechaLoading(painel) {
+    $(`#${painel}`).loading('toggle');
+}
+
+function efetuarLogin() {
+
+    mostraLoading('painellogin', "Acessando sistema...");
+
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/usuario/logar/",
+        data: JSON.stringify(getFormData("formlogin")),
+        success: function(res){
+
+            fechaLoading("painellogin");
+
+            $.ajax({
+                type: "POST",
+                url: "./confirmalogin.php",
+                data: JSON.stringify(getFormData("formlogin")),
+                success: function(res){
+                    window.location.href = "http://localhost:8081/estoquefacilfrontend/index.php";
+                },
+                error: function(err){
+                    console.error(err);
+                },
+                dataType: "json",
+                contentType : "application/json"
+              });	            
+
+
+        },
+        error: function(err){
+            
+            fechaLoading("painellogin");
+
+            var mensagemErro = 'Erro ao logar contate o administrador';
+
+            if(err.responseJSON && err.responseJSON.message)
+                mensagemErro = err.responseJSON.message;
+
+            mostraToastErro(mensagemErro);
+            console.error(err);
+        },
+        dataType: "json",
+        contentType : "application/json"
+      });    
+}
+
+
 function mostrarGridPedidos(){
  
     $("#jsGrid").jsGrid({
@@ -163,8 +232,8 @@ function consultarTrackings(){
       });		
 }
 
-function getFormData(){
-    var unindexed_array = $("#principal").serializeArray();
+function getFormData(idForm){
+    var unindexed_array = $(`#${idForm}`).serializeArray();
     var indexed_array = {};
 
     $.map(unindexed_array, function(n, i){
