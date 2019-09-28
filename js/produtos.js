@@ -1,6 +1,10 @@
 var produtosList = [];
 var idProduto = "";
 
+var produtosEntrada = [];
+var produtosSaida = [];
+var produtoSelecionado = null;
+
 function telaProduto(id) {
 
     if(id == undefined) {
@@ -165,4 +169,84 @@ function montaGridProdutos(){
             }
         ]
     });
+}
+
+function montaGridSelecionaProdutos(idLista, listaProdutos){
+ 
+    $(`#${idLista}`).jsGrid({
+        width: "100%",
+        height: "130",
+ 
+        inserting: false,
+        editing: false,
+        sorting: true,
+        selecting:true,
+        paging: false,
+        noDataContent: "Nenhum produto encontrado",
+        data: listaProdutos,
+        rowClick: function(args) {
+            produtoSelecionado = args.item;
+            $(`#produto-selecionado${idLista}`).text(`Produto selecionado: ${args.item.id} - ${args.item.descricao}`);
+        },        
+        fields: [
+            { name: "id", type: "text", width: 15, title : "Código" },
+            { name: "descricao", type: "text", width: 50, title : "Descrição" }
+        ]
+    });
+}
+
+function buscaProdutoSimples(event){
+    if(event.keyCode == 13) {
+        buscarProdutosCodBarrasDescricao(event.path[0].id);
+    }
+}
+
+function buscarProdutosCodBarrasDescricao(campo) {
+    
+    var bProdutosEntrada = (campo == "entradaProduto");
+    
+    idLista = (bProdutosEntrada ? "gridProdutoEntrada" : "gridProdutoSaida");
+    idLoading = (bProdutosEntrada ? "painelprodutosentrada" : "painelprodutosaida");
+
+    mostraLoading(idLoading, "Procurando produtos");
+    
+    $.ajax({
+        type: "GET",
+        url: getUrlWS("produto/buscaDsCdBarra/"+elemento(campo).value),
+        success: function(res){
+            
+            produtosEntrada = [];
+            produtosSaida = [];
+
+            fechaLoading(idLoading);
+
+            if(!res || res.length <= 0) {
+                mostraToastAviso('Nenhum produto encontrado');
+            } else {
+                for(var prop in res) {
+                    if(bProdutosEntrada)
+                        produtosEntrada.push(res[prop]);
+                    else
+                        produtosSaida.push(res[prop]);
+                }
+            }
+            
+            montaGridSelecionaProdutos(idLista, (bProdutosEntrada ? produtosEntrada : produtosSaida));
+        },
+        error: function(err){
+            
+            produtosEntrada = [];
+            produtosSaida = [];
+
+            montaGridSelecionaProdutos(idLista, [])
+            
+            fechaLoading(idLoading);
+
+            mostraToastErro((res.message ? res.message : 'Erro ao realizar a consulta'));
+            console.error(err);
+
+        },
+        dataType: "json",
+        contentType : "application/json"
+      });
 }
