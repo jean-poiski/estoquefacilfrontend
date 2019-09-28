@@ -195,9 +195,9 @@ function montaGridSelecionaProdutos(idLista, listaProdutos){
     });
 }
 
-function buscaProdutoSimples(event){
+function buscaProdutoSimples(event, idCampo){
     if(event.keyCode == 13) {
-        buscarProdutosCodBarrasDescricao(event.path[0].id);
+        buscarProdutosCodBarrasDescricao(idCampo);
     }
 }
 

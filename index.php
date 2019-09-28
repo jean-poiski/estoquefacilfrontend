@@ -386,7 +386,7 @@
 
         <div class="form-group">
             <label for="entradaProdutdo" class="required">Produto</label>
-            <input type="text" class="form-control" id="entradaProduto" placeholder="Pesquise pelo Código de barras ou Descrição do Produto" onkeypress="return buscaProdutoSimples(event);" required>
+            <input type="text" class="form-control" id="entradaProduto" placeholder="Pesquise pelo Código de barras ou Descrição do Produto" onkeypress="return buscaProdutoSimples(event, 'entradaProduto');" required>
             <div id="painelprodutosentrada">
               <div class="row pt-0 mt-0">
                 <div class="col-md-12 col-sm-6 text-center">
@@ -437,7 +437,7 @@
 
         <div class="form-group">
             <label for="saidaProdutdo" class="required">Produto</label>
-            <input type="text" class="form-control" id="saidaProduto" placeholder="Pesquise pelo Código de barras ou Descrição do Produto" onkeypress="return buscaProdutoSimples(event);" required>
+            <input type="text" class="form-control" id="saidaProduto" placeholder="Pesquise pelo Código de barras ou Descrição do Produto" onkeypress="return buscaProdutoSimples(event, 'saidaProduto');" required>
             <div id="painelprodutosaida">
               <div class="row pt-0 mt-0">
                 <div class="col-md-12 col-sm-6 text-center">
