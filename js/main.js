@@ -22,7 +22,6 @@ function mostraToast(mensagem, tipo="success") {
     toastr[tipo](mensagem);
 }
 
-
 function validarCamposLogin(){
     var formValido = true;
 
@@ -32,6 +31,23 @@ function validarCamposLogin(){
         efetuarLogin();
     else
         mostraToastAviso("Você preencheu seu usuário e sua senha?");
+
+    return formValido;
+}
+
+function validarCamposNovoUsuario() {
+    var formValido = true;
+
+    formValido = document.forms["novousuario"].checkValidity();
+
+    if(formValido) {
+        if(elemento("senha").value != elemento("confirmasenha").value) {
+            mostraToastAviso("As senhas informadas não coincidem");
+            return false;
+        }
+        cadastrarUsuario();
+    } else
+        mostraToastAviso("Você precisa preencher todos os campos ;)");
 
     return formValido;
 }
@@ -46,13 +62,21 @@ function fechaLoading(painel) {
     $(`#${painel}`).loading('toggle');
 }
 
+function navegarPara(url) {
+    window.location.href = `http://localhost:8081/estoquefacilfrontend/${url}`;
+}
+
+function getUrlWS(detalhe) {
+    return `http://localhost:8080/${detalhe}`
+}
+
 function efetuarLogin() {
 
     mostraLoading('painellogin', "Acessando sistema...");
 
     $.ajax({
         type: "POST",
-        url: "http://localhost:8080/usuario/logar/",
+        url: getUrlWS("/usuario/logar/"),
         data: JSON.stringify(getFormData("formlogin")),
         success: function(res){
 
@@ -63,7 +87,7 @@ function efetuarLogin() {
                 url: "./confirmalogin.php",
                 data: JSON.stringify(getFormData("formlogin")),
                 success: function(res){
-                    window.location.href = "http://localhost:8081/estoquefacilfrontend/index.php";
+                    navegarPara("index.php");
                 },
                 error: function(err){
                     console.error(err);
@@ -91,51 +115,49 @@ function efetuarLogin() {
       });    
 }
 
+function cadastrarUsuario() {
 
-function mostrarGridPedidos(){
- 
-    $("#jsGrid").jsGrid({
-        width: "100%",
-        height: "100%",
- 
-        inserting: false,
-        editing: false,
-        sorting: true,
-        paging: false,
-        noDataContent: "Nenhuma encomenda encontrada",
-        data: pedidos,
-        rowClick: function(row) {
-            
-            $("#modalHistoricos").modal("toggle");
+    mostraLoading('painellogin', "Estamos cadastrando seu usuário");
 
-            $("#gridHistoricos").jsGrid("loadData", {documentos: row.item.minuta});
+    $.ajax({
+        type: "POST",
+        url: getUrlWS("/usuario/"),
+        data: JSON.stringify(getFormData("novousuario")),
+        success: function(res){
 
-        },
-        fields: [
-            { name: "minuta", type: "text", width: 50, title : "Minuta" },
-            { 
-                name: "", 
-                type: "text", 
-                width: 150, 
-                title: "CT-e",
-                itemTemplate: function(value, item) {
-                    return item.cte_numero + "-" +item.cte_serie;
-                }
-            },
-            { 
-                name: "", 
-                title: "Ver", 
-                width: 30,
-                headerTemplate: function() {
-                    return "<span title='Ver histórico de eventos'>Ver</span>"
+            fechaLoading("painellogin");
+
+            $.ajax({
+                type: "POST",
+                url: "./confirmalogin.php",
+                data: JSON.stringify(getFormData("novousuario")),
+                success: function(res){
+                    navegarPara("index.php");
                 },
-                itemTemplate: function(value, item) { 
-                    return '<i class="fas fa-search-plus"></i>';
-                }
-            }
-        ]
-    });
+                error: function(err){
+                    console.error(err);
+                },
+                dataType: "json",
+                contentType : "application/json"
+              });	            
+        },
+        error: function(err){
+            
+            fechaLoading("painellogin");
+
+            var mensagemErro = 'Erro ao cadastrar o usuário contate o administrador';
+
+            if(err.responseJSON && err.responseJSON.message)
+                mensagemErro = err.responseJSON.message;
+
+            mostraToastErro(mensagemErro);
+            console.error(err);
+        },
+        dataType: "json",
+        contentType : "application/json"
+      });    
 }
+
 
 function mostrarGridHistoricos(){
 
@@ -186,51 +208,6 @@ function mostrarGridHistoricos(){
 }
 
 
-
-function consultarTrackings(){
-
-    $('#painelcompleto').loading({
-        message: '<i class="fa fa-dolly faa-passing animated"></i> Estamos localizando suas encomendas'
-    });
-
-
-    $.ajax({
-        type: "POST",
-        url: "control/findtracking.php",
-        data: JSON.stringify(getFormData()),
-        success: function(res){
-
-            pedidos = [];
-
-            $('#painelcompleto').loading('toggle');
-
-            if(!res.status) {
-                mostraToastAviso((res.message ? res.message : 'Nenhuma encomenda encontrada'));
-            } else if(res.dados.length <= 0) {
-                mostraToastAviso('Nenhuma encomenda encontrada');
-            } else {
-                for(var prop in res.dados) {
-                    pedidos.push(res.dados[prop]);
-                }
-            }
-            
-            mostrarGridPedidos();
-        },
-        error: function(err){
-            
-            pedidos = [];
-            mostrarGridPedidos();
-            
-            $('#painelcompleto').loading('toggle');
-
-            mostraToastErro((res.message ? res.message : 'Erro ao realizar a consulta'));
-            console.error(err);
-
-        },
-        dataType: "json",
-        contentType : "application/json"
-      });		
-}
 
 function getFormData(idForm){
     var unindexed_array = $(`#${idForm}`).serializeArray();

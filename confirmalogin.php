@@ -11,7 +11,7 @@ session_start();
 
 $dadosLogin = getParams();
 
-$_SESSION["usuariologado"] = $dadosLogin["usuario"];
+$_SESSION["usuariologado"] = (isset($dadosLogin["usuario"]) ? $dadosLogin["usuario"] : $dadosLogin["nome"]);
 $sucesso["success"] = true;
 echo json_encode($sucesso);
 

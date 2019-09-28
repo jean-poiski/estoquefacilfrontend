@@ -54,23 +54,31 @@
     <div class="container">
 
         <div class="jumbotron">
-            <h1 class="display-4">Seja bem vindo ao Estoque Fácil!</h1>
-            <p class="lead">Controle seu estoque de maneira simples e fácil. E em breve, muitas novidades</p>
-            <hr class="my-4">
-            <p>Vamos acessar? Se é novo por aqui, <a class="" href="#" onclick="navegarPara('novousuario.php');">Clique aqui</a> para se cadastrar</p>
+            <h1 class="display-4">Novo Usuário para acesso ao Estoque Fácil!</h1>
+            <p class="lead">Preencha as informações abaixo para cadastrar seu usuário.</p>
         </div>
 
         <div id="painellogin">
-            <form id="formlogin">
+            <form id="novousuario">
+                <div class="form-group">
+                    <label for="email" class="required">E-mail</label>
+                    <input type="text" class="form-control" id="email" name="email" placeholder="Informe seu E-mail" required>
+                </div>
                 <div class="form-group">
                     <label for="usuario" class="required">Usuário</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Informe seu usuário" required>
+                    <input type="text" class="form-control" id="usuario" name="nome" placeholder="Informe seu usuário" required>
                 </div>
                 <div class="form-group">
                     <label for="senha" class="required">Senha</label>
-                    <input type="password" class="form-control" id="senha" name="senha" placeholder="Informe sua senha">
+                    <input type="password" class="form-control" id="senha" name="senha" placeholder="Informe sua senha" required>
                 </div>
-                <button type="button" onclick="validarCamposLogin()" class="btn btn-primary">Acessar</button>
+                <div class="form-group">
+                    <label for="confirmasenha" class="required">Confirmar Senha</label>
+                    <input type="password" class="form-control" id="confirmasenha" placeholder="Informe novamente sua senha" required>
+                </div>
+
+                <button type="button" onclick="validarCamposNovoUsuario()" class="btn btn-primary">Cadastrar</button>
+                <button type="button" onclick="navegarPara('login.php')" class="btn btn-secondary">Voltar</button>
                 
             </form>
         </div>

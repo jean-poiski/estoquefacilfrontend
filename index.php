@@ -6,6 +6,22 @@
         die();
     }
 
+    function retornarTitulo() {
+      $usuarioTitulo = $_SESSION["usuariologado"];
+
+      $meioDia = date('Y-m-d') . ' 12:00:00' ;
+      $horaNoite = date('Y-m-d') . ' 18:00:00';
+      
+      $dataAtual = date('Y-m-d H:i:s');
+      if(strtotime($dataAtual) >= strtotime($horaNoite))
+        return "Boa noite $usuarioTitulo";
+
+      if(strtotime($dataAtual) >= strtotime($meioDia))
+        return "Boa tarde $usuarioTitulo";
+
+      return "Bom dia $usuarioTitulo";
+    }
+    
 ?>
 
 <!DOCTYPE html>
@@ -41,23 +57,43 @@
     <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 
   <script src="js/main.js"></script>
+  <script src="js/despesas.js"></script>
+  <script src="js/produtos.js"></script>
   <script src="js/jquery.loading.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function(){
-      
+      montaGridProdutos();
+      montaGridDespesas();
+
+      $('#valor-desp').inputmask({
+        alias: 'numeric', 
+        allowMinus: false,  
+        digits: 2, 
+        max: 999.99
+      });
+
+      $('#valor-produto').inputmask({
+        alias: 'numeric', 
+        allowMinus: false,  
+        digits: 2, 
+        max: 999.99
+      });
+
     });
   </script>
 
 </head>
 
 <body>
-    <div class="jumbotron">
-
-    </div>
 
     <!--TELA PRINCIPAL -->
     <div class="container">
+      <div class="jumbotron">
+        <p class="lead"><?php echo retornarTitulo(); ?> <button type="button" class="btn btn-info btn-sm float-right" onclick="navegarPara('login.php')">Sair do Sistema</button></p>
+        <hr class="my-4">
+        
+      </div>
 
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item">
@@ -87,30 +123,83 @@
 
           <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-produto" role="tabpanel" aria-labelledby="pills-produto-tab">
+
+              <div id="painelprodutos">
+                <div class="form-group row">
+                  <div class="col-md-12 col-sm-6">
+                    <button type="button" class="btn btn-primary" onclick="buscarProdutos()"><i class="fas fa-search"></i> Atualizar Lista</button>
+                    <button type="button" class="btn btn-primary" onclick="telaProduto()"><i class="fas fa-bacon"></i> Cadastrar Produto</button>
+                  </div>
+                </div>
+
+                <div class="row pt-0 mt-0">
+                  <div class="col-md-12 col-sm-6 text-center">
+                    <div id="gridProdutos"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-pane fade" id="pills-estoque" role="tabpanel" aria-labelledby="pills-despesas-tab">
+            <div class="tab-pane fade" id="pills-estoque" role="tabpanel" aria-labelledby="pills-estoque-tab">
 
-              <div class="row">
+              <ul class="nav nav-pills mb-3" id="pills-entradasaida" role="tablist">
+                <li class="nav-item">
+                <a class="nav-link active" id="pills-entradaestoque-tab" data-toggle="pill" href="#pills-entrataestoque" role="tab" aria-controls="pills-entradaestoque" aria-selected="true">Entrada</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" id="pills-saidaestoque-tab" data-toggle="pill" href="#pills-saidaestoque" role="tab" aria-controls="pills-saidaestoque" aria-selected="false">Saída</a>
+                </li>
+              </ul>
+
+              <div class="tab-pane fade" id="pills-entradaestoque" role="tabpanel" aria-labelledby="pills-entrataestoque-tab">
+
+              <div id="painelentradaestoque">
+              <div class="form-group row">
                 <div class="col-md-12 col-sm-6">
-                
-                </div>              
+                  <button type="button" class="btn btn-primary" onclick="buscaEntradas()"><i class="fas fa-search-dollar"></i> Atualizar Lista</button>
+                  <button type="button" class="btn btn-primary" onclick="telaEntrada()"><i class="fas fa-plus"></i></i> Registrar Entrada</button>
+                </div>
               </div>
 
-              <div class="row">
-                <div class="col-md-12 col-sm-6">
-                  <button type="button" class="btn btn-secondary" onclick="trocarGuias('pills-produto-tab')"> <i class="fas fa-angle-left"></i> Voltar </button>
-                  <button type="button" class="btn btn-secondary float-right" onclick="trocarGuias('pills-vendas-tab')"> Próximo <i class="fas fa-angle-right"></i> </button>
+              <div class="row pt-0 mt-0">
+                <div class="col-md-12 col-sm-6 text-center">
+                  <div id="gridEntradaEstoque"></div>
                 </div>
+              </div>
+            </div>
+
+                
+              </div>
+
+              <div class="tab-pane fade" id="pills-saidaestoque" role="tabpanel" aria-labelledby="pills-saidaestoque-tab">
+                <p>EM BREVE</p>
               </div>
 
             </div>
 
             <div class="tab-pane fade" id="pills-vendas" role="tabpanel" aria-labelledby="pills-vendas-tab">
-
+              <p>EM BREVE</p>
             </div>
+
+            <!-- GUIA DESPESAS -->
             <div class="tab-pane fade" id="pills-despesas" role="tabpanel" aria-labelledby="pills-despesas-tab">
-              
+
+            <div id="paineldespesas">
+              <div class="form-group row">
+                <div class="col-md-12 col-sm-6">
+                  <button type="button" class="btn btn-primary" onclick="buscarDespesas()"><i class="fas fa-search-dollar"></i> Atualizar Lista</button>
+                  <button type="button" class="btn btn-primary" onclick="telaDespesa()"><i class="fas fa-money-bill-wave"></i> Cadastrar Despesa</button>
+                </div>
+              </div>
+
+              <div class="row pt-0 mt-0">
+                <div class="col-md-12 col-sm-6 text-center">
+                  <div id="gridDespesas"></div>
+                </div>
+              </div>
+            </div>
+
+
             </div>
           </div>
 
@@ -121,26 +210,113 @@
 
 
 
-<!-- MODAL DE LOGIN -->
-<div class="modal fade" id="modalHistoricos" tabindex="-1" role="dialog" aria-labelledby="modalHistoricosTitle" aria-hidden="true">
+<!-- MODAL DE DESPESA -->
+<div class="modal fade" id="modalDespesas" tabindex="-1" role="dialog" aria-labelledby="modalDespesasTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalHistoricosTitle">Histórico do Pedido</h5>
+        <h5 class="modal-title" id="modalDespesasTitle">Nova Despesa</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body container-fluid" style="max-width: 100%; overflow-x: auto;">
 
-        <div id="gridHistoricos"></div>
+      <form id="formdespesa">
+        
+        <div class="form-group">
+            <label for="descricao-desp" class="required">Descrição</label>
+            <input type="text" class="form-control" id="descricao-desp" name="descricao" placeholder="Descrição da despesa" required>
+        </div>
+        <div class="form-group">
+            <label for="valor-desp" class="required">Valor</label>
+            <input type="text" class="form-control numeric" id="valor-desp" name="valor" placeholder="Valor da despesa">
+            <input type="hidden" id="usuario-inc-desp" name="usuarioInclusao" value="<?php echo $_SESSION["usuariologado"]; ?>">
+        </div>
+
+        <div class="form-group">
+          <label for="obs-desp">Observações</label>
+          <textarea class="form-control" id="obs-desp" name="observacoes" rows="3"></textarea>
+        </div>        
+              
+      </form>
+        
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="salvarDespesa()">Salvar</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
       </div>
     </div>
   </div>
 </div>    
+
+
+
+<!-- MODAL DE PRODUTO -->
+<div class="modal fade" id="modalProdutos" tabindex="-1" role="dialog" aria-labelledby="modalProdutosTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalProdutosTitle">Novo Produto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body container-fluid" style="max-width: 100%; overflow-x: auto;">
+
+      <form id="formproduto">
+        
+        <div class="form-group">
+            <label for="descricao-produto" class="required">Descrição</label>
+            <input type="text" class="form-control" id="descricao-produto" name="descricao" placeholder="Descrição da produto" required>
+            <input type="hidden" id="usuario-inc-desp" name="usuarioInclusao" value="<?php echo $_SESSION["usuariologado"]; ?>">
+        </div>
+
+        <div class="form-group">
+            <label for="codigobarra-produto" class="required">Código de Barras</label>
+            <input type="text" class="form-control" id="codigobarra-produto" name="codigoBarras" placeholder="Código de barras" required>
+        </div>
+        <div class="form-group">
+            <label for="valor-produto" class="required">Valor</label>
+            <input type="text" class="form-control numeric" id="valor-produto" name="valor" placeholder="Valor do Produto">
+        </div>
+
+        <div class="form-group">
+          <label for="embalagem-produto">Embalagem</label>
+          <select class="form-control" id="embalagem-produto" name="tipoEmbalagem">
+            <option value="UNIDADE">Unidade</option>
+            <option value="PESO">Peso</option>
+            <option value="CAIXA">Caixa</option>
+          </select>
+        </div>        
+
+        <div class="form-group">
+          <label for="categoria-produto">Categoria</label>
+          <select class="form-control" id="embalagem-produto" name="tipoProduto">
+            <option value="ALIMENTO">Alimento</option>
+            <option value="BEBIDA">Bebida</option>
+            <option value="EQUIPAMENTO">Equipamento</option>
+            <option value="OUTROS">Outros</option>
+          </select>
+        </div>        
+
+        <div class="form-group">
+          <label for="obs-produto">Observações</label>
+          <textarea class="form-control" id="obs-produto" name="observacoes" rows="3"></textarea>
+        </div>        
+
+              
+      </form>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>    
+
 
 </body>
 
